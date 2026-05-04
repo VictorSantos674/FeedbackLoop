@@ -120,6 +120,34 @@ O painel usa filtros refletidos na URL via `useSearchParams`, cache com TanStack
 - `POST /api/widget/{boardSlug}/posts`
 - `POST /api/widget/{boardSlug}/posts/{postId}/vote`
 
+## Deploy no Railway
+
+Ordem recomendada:
+
+1. Crie o PostgreSQL no Railway.
+2. Publique a API usando `FeedbackLoop.Api/Dockerfile`.
+3. Configure as variaveis da API:
+
+```env
+ASPNETCORE_ENVIRONMENT=Production
+ConnectionStrings__FeedbackLoopDb=Host=...;Database=...;Username=...;Password=...
+Jwt__Secret=troque-por-um-segredo-forte-com-32-caracteres
+Jwt__Issuer=feedbackloop-api
+Jwt__Audience=feedbackloop-clients
+Cors__AllowedOrigins__0=https://url-do-painel.up.railway.app
+```
+
+4. Publique o painel usando `feedbackloop-app/Dockerfile`.
+5. Configure `VITE_API_BASE_URL` no painel antes do build:
+
+```env
+VITE_API_BASE_URL=https://url-da-api.up.railway.app
+```
+
+6. Depois que o painel estiver no ar, volte na API e confirme que `Cors__AllowedOrigins__0` aponta para a URL final do painel.
+
+As migrations do EF Core sao aplicadas automaticamente no startup da API, inclusive em `Production`.
+
 ## Roadmap
 
 - [ ] Notificacoes por e-mail ao mudar status de um post

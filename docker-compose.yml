@@ -27,6 +27,7 @@ services:
       Jwt__Secret: ${JWT_SECRET:-TROQUE-POR-SEGREDO-FORTE-EM-PRODUCAO-32-CHARS-MINIMO}
       Jwt__Issuer: feedbackloop-api
       Jwt__Audience: feedbackloop-clients
+      Cors__AllowedOrigins__0: ${APP_BASE_URL:-http://localhost:3000}
     depends_on:
       postgres:
         condition: service_healthy
