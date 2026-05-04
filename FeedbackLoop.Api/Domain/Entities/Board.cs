@@ -32,5 +32,7 @@ public class Board : IWorkspaceScopedEntity
 
     public DateTime? UpdatedAtUtc { get; set; }
 
+    public DateTime? DeletedAt { get; set; }
+
     public ICollection<Post> Posts { get; set; } = new List<Post>();
 }

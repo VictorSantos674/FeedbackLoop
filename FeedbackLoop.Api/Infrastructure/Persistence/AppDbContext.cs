@@ -217,8 +217,9 @@ public class AppDbContext : DbContext
             || entity.WorkspaceId == _currentWorkspaceContext.WorkspaceId.Value);
 
         modelBuilder.Entity<Board>().HasQueryFilter(entity =>
-            !_currentWorkspaceContext.WorkspaceId.HasValue
-            || entity.WorkspaceId == _currentWorkspaceContext.WorkspaceId.Value);
+            entity.DeletedAt == null
+            && (!_currentWorkspaceContext.WorkspaceId.HasValue
+                || entity.WorkspaceId == _currentWorkspaceContext.WorkspaceId.Value));
 
         modelBuilder.Entity<Post>().HasQueryFilter(entity =>
             !_currentWorkspaceContext.WorkspaceId.HasValue

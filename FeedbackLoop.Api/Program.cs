@@ -5,6 +5,7 @@ using FeedbackLoop.Api.Infrastructure.Auth;
 using FeedbackLoop.Api.Infrastructure.Persistence;
 using FeedbackLoop.Api.Infrastructure.Tenancy;
 using FeedbackLoop.Api.Infrastructure.Time;
+using FeedbackLoop.Api.Middleware;
 using FeedbackLoop.Api.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +20,18 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSett
 builder.Services.AddScoped<ICurrentWorkspaceContext, CurrentWorkspaceContext>();
 builder.Services.AddScoped<ISystemClock, SystemClock>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IVoteService, VoteService>();
+builder.Services.AddScoped<INotificationService, LogNotificationService>();
 builder.Services.AddScoped<IUserRepository, EfUserRepository>();
 builder.Services.AddScoped<IWorkspaceRepository, EfWorkspaceRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, EfRefreshTokenRepository>();
+builder.Services.AddScoped<IBoardRepository, EfBoardRepository>();
+builder.Services.AddScoped<IPostRepository, EfPostRepository>();
+builder.Services.AddScoped<IVoteRepository, EfVoteRepository>();
+builder.Services.AddScoped<IStatusHistoryRepository, EfStatusHistoryRepository>();
+builder.Services.AddScoped<ITransactionRunner, EfTransactionRunner>();
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -66,6 +76,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseAuthentication();
 app.UseMiddleware<WorkspaceResolutionMiddleware>();
 app.UseAuthorization();
