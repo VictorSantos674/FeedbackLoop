@@ -58,3 +58,21 @@ O build do widget gera um bundle UMD em `feedbackloop-widget/dist`.
 - `POST /api/auth/login`
 - `POST /api/auth/refresh`
 - `POST /api/auth/logout`
+
+## Endpoints do produto
+
+- `GET /api/boards`
+- `GET /api/boards/{id}`
+- `POST /api/boards`
+- `PUT /api/boards/{id}`
+- `DELETE /api/boards/{id}`
+- `GET /api/boards/{boardId}/posts`
+- `GET /api/boards/{boardId}/posts/{postId}`
+- `PATCH /api/boards/{boardId}/posts/{postId}/status`
+- `GET /api/boards/{boardId}/posts/{postId}/history`
+
+## Endpoints publicos do widget
+
+- `GET /api/widget/{boardSlug}/posts`
+- `POST /api/widget/{boardSlug}/posts`
+- `POST /api/widget/{boardSlug}/posts/{postId}/vote`
