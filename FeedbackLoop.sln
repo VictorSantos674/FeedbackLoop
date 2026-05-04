@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedbackLoop.Api", "FeedbackLoop.Api\FeedbackLoop.Api.csproj", "{07AED3C8-03B4-41AF-91A4-4E1D11FDA481}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedbackLoop.Api.Tests", "FeedbackLoop.Api.Tests\FeedbackLoop.Api.Tests.csproj", "{68F33AF4-F75B-4074-BEC1-A437AE51A803}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07AED3C8-03B4-41AF-91A4-4E1D11FDA481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07AED3C8-03B4-41AF-91A4-4E1D11FDA481}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07AED3C8-03B4-41AF-91A4-4E1D11FDA481}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07AED3C8-03B4-41AF-91A4-4E1D11FDA481}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68F33AF4-F75B-4074-BEC1-A437AE51A803}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68F33AF4-F75B-4074-BEC1-A437AE51A803}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68F33AF4-F75B-4074-BEC1-A437AE51A803}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68F33AF4-F75B-4074-BEC1-A437AE51A803}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
