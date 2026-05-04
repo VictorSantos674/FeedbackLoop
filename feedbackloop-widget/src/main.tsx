@@ -1,50 +1,95 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot, type Root } from 'react-dom/client';
 import { Widget } from './Widget';
-import './styles.css';
+import type { WidgetConfig } from './types';
+import widgetCss from './styles/widget.css?inline';
 
-export type FeedbackLoopWidgetOptions = {
-  boardSlug: string;
-  endUserToken: string;
-  apiBaseUrl: string;
-  container: string | HTMLElement;
+type FeedbackLoopPublicApi = {
+  init(config: WidgetConfig): void;
+  destroy(): void;
 };
 
-export function mountFeedbackLoopWidget(options: FeedbackLoopWidgetOptions) {
-  const container =
-    typeof options.container === 'string'
-      ? document.querySelector(options.container)
-      : options.container;
+let root: Root | null = null;
+let hostElement: HTMLDivElement | null = null;
+let cleanupThemeListener: (() => void) | null = null;
 
-  if (!container) {
-    throw new Error('FeedbackLoop widget container not found.');
-  }
+export function init(config: WidgetConfig) {
+  validateConfig(config);
+  destroy();
 
-  ReactDOM.createRoot(container).render(
+  hostElement = document.createElement('div');
+  hostElement.setAttribute('data-feedbackloop-widget', 'true');
+  document.body.appendChild(hostElement);
+
+  const shadowRoot = hostElement.attachShadow({ mode: 'open' });
+  const style = document.createElement('style');
+  style.textContent = widgetCss;
+  shadowRoot.appendChild(style);
+
+  const mountNode = document.createElement('div');
+  shadowRoot.appendChild(mountNode);
+  applyTheme(shadowRoot, config.theme ?? 'light');
+
+  root = createRoot(mountNode);
+  root.render(
     <React.StrictMode>
-      <Widget options={options} />
+      <Widget config={{ ...config, position: config.position ?? 'bottom-right', theme: config.theme ?? 'light' }} />
     </React.StrictMode>
   );
 }
 
-declare global {
-  interface Window {
-    FeedbackLoopWidget?: {
-      mount: typeof mountFeedbackLoopWidget;
-    };
+export function destroy() {
+  cleanupThemeListener?.();
+  cleanupThemeListener = null;
+  root?.unmount();
+  root = null;
+  hostElement?.remove();
+  hostElement = null;
+}
+
+function validateConfig(config: WidgetConfig) {
+  if (!config?.boardSlug) {
+    throw new Error('FeedbackLoop.init requires boardSlug.');
+  }
+
+  if (!config.endUserToken) {
+    throw new Error('FeedbackLoop.init requires endUserToken.');
+  }
+
+  if (!config.apiBaseUrl) {
+    throw new Error('FeedbackLoop.init requires apiBaseUrl.');
   }
 }
 
-window.FeedbackLoopWidget = {
-  mount: mountFeedbackLoopWidget
-};
+function applyTheme(shadowRoot: ShadowRoot, theme: WidgetConfig['theme']) {
+  const host = shadowRoot.host;
+  host.classList.remove('dark');
 
-const sandboxContainer = document.getElementById('feedbackloop-widget');
-if (sandboxContainer) {
-  mountFeedbackLoopWidget({
-    apiBaseUrl: 'http://localhost:5000',
-    boardSlug: 'demo',
-    endUserToken: crypto.randomUUID(),
-    container: sandboxContainer
-  });
+  if (theme === 'dark') {
+    host.classList.add('dark');
+    return;
+  }
+
+  if (theme === 'auto') {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const syncTheme = (matches: boolean) => {
+      host.classList.toggle('dark', matches);
+    };
+
+    syncTheme(mediaQuery.matches);
+    const listener = (event: MediaQueryListEvent) => syncTheme(event.matches);
+    mediaQuery.addEventListener('change', listener);
+    cleanupThemeListener = () => mediaQuery.removeEventListener('change', listener);
+  }
 }
+
+declare global {
+  interface Window {
+    FeedbackLoop?: FeedbackLoopPublicApi;
+  }
+}
+
+window.FeedbackLoop = {
+  init,
+  destroy
+};

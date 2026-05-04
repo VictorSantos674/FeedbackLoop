@@ -6,7 +6,16 @@
     <title>FeedbackLoop Widget Sandbox</title>
   </head>
   <body>
-    <div id="feedbackloop-widget"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script type="module">
+      window.FeedbackLoop.init({
+        boardSlug: 'demo',
+        endUserToken: crypto.randomUUID(),
+        endUserName: 'Usuario Demo',
+        apiBaseUrl: 'http://localhost:5000',
+        position: 'bottom-right',
+        theme: 'auto'
+      });
+    </script>
   </body>
 </html>
