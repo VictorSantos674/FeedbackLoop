@@ -9,5 +9,9 @@ dist/
 *.user
 *.suo
 *.rsuser
+appsettings.Development.json
 TestResults/
 coverage/
+postgres_data/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-feedbackloop}
+      POSTGRES_USER: ${POSTGRES_USER:-fl_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fl_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fl_user} -d ${POSTGRES_DB:-feedbackloop}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./FeedbackLoop.Api
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__FeedbackLoopDb: "Host=postgres;Database=${POSTGRES_DB:-feedbackloop};Username=${POSTGRES_USER:-fl_user};Password=${POSTGRES_PASSWORD:-fl_pass}"
+      Jwt__Secret: ${JWT_SECRET:-TROQUE-POR-SEGREDO-FORTE-EM-PRODUCAO-32-CHARS-MINIMO}
+      Jwt__Issuer: feedbackloop-api
+      Jwt__Audience: feedbackloop-clients
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app:
+    build:
+      context: ./feedbackloop-app
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${API_BASE_URL:-http://localhost:5000}
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
