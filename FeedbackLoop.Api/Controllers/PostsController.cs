@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FeedbackLoop.Api.Controllers;
 
 [ApiController]
-[Authorize]
+[Authorize(Policy = "MemberOrAbove")]
 [Route("api/boards/{boardId:guid}/posts")]
 public sealed class PostsController : ControllerBase
 {
@@ -36,7 +36,7 @@ public sealed class PostsController : ControllerBase
     [HttpGet("{postId:guid}")]
     public async Task<ActionResult<PostResponse>> GetById(Guid boardId, Guid postId, CancellationToken cancellationToken)
     {
-        return Ok(await _posts.GetByIdAsync(postId, cancellationToken: cancellationToken));
+        return Ok(await _posts.GetByIdAsync(boardId, postId, cancellationToken: cancellationToken));
     }
 
     [HttpPatch("{postId:guid}/status")]
@@ -47,12 +47,12 @@ public sealed class PostsController : ControllerBase
         UpdatePostStatusRequest request,
         CancellationToken cancellationToken)
     {
-        return Ok(await _posts.UpdateStatusAsync(postId, request.Status, User.GetUserId(), cancellationToken));
+        return Ok(await _posts.UpdateStatusAsync(boardId, postId, request.Status, User.GetUserId(), cancellationToken));
     }
 
     [HttpGet("{postId:guid}/history")]
     public async Task<ActionResult<IReadOnlyList<StatusHistoryEntry>>> GetStatusHistory(Guid boardId, Guid postId, CancellationToken cancellationToken)
     {
-        return Ok(await _posts.GetStatusHistoryAsync(postId, cancellationToken));
+        return Ok(await _posts.GetStatusHistoryAsync(boardId, postId, cancellationToken));
     }
 }

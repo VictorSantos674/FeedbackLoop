@@ -24,7 +24,7 @@ public sealed class AuthController : ControllerBase
         try
         {
             var response = await _authService.RegisterAsync(request, GetUserAgent(), cancellationToken);
-            return Ok(response);
+            return StatusCode(StatusCodes.Status201Created, response);
         }
         catch (ConflictException exception)
         {

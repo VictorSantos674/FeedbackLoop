@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -22,8 +23,23 @@ export function RegisterPage() {
   const form = useForm<RegisterForm>({ resolver: zodResolver(schema), defaultValues: { name: '', email: '', password: '', workspaceName: '' } });
 
   async function onSubmit(data: RegisterForm) {
-    await register.mutateAsync(data);
-    navigate('/login', { state: { message: 'Workspace criado com sucesso.' } });
+    try {
+      await register.mutateAsync(data);
+      navigate('/login', { state: { message: 'Workspace criado com sucesso.' } });
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 409) {
+        form.setError('email', {
+          type: 'manual',
+          message: 'Este e-mail ja esta cadastrado.'
+        });
+        return;
+      }
+
+      form.setError('root', {
+        type: 'manual',
+        message: 'Nao foi possivel criar a conta.'
+      });
+    }
   }
 
   return (
@@ -35,7 +51,17 @@ export function RegisterPage() {
           <Input label="E-mail" type="email" error={form.formState.errors.email?.message} {...form.register('email')} />
           <Input label="Senha" type="password" error={form.formState.errors.password?.message} {...form.register('password')} />
           <Input label="Workspace" error={form.formState.errors.workspaceName?.message} {...form.register('workspaceName')} />
-          <Button type="submit" disabled={register.isPending}>{register.isPending ? 'Criando...' : 'Criar conta'}</Button>
+          {form.formState.errors.root?.message ? <p className="text-sm font-semibold text-red-600">{form.formState.errors.root.message}</p> : null}
+          <Button type="submit" disabled={register.isPending} className="w-full">
+            {register.isPending ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Criando...
+              </>
+            ) : (
+              'Criar conta'
+            )}
+          </Button>
         </form>
         <p className="mt-4 text-sm text-slate-500">
           Ja tem conta? <Link className="font-bold text-brand-700" to="/login">Entrar</Link>

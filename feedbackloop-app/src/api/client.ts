@@ -8,6 +8,10 @@ export const apiClient = axios.create({
   baseURL: API_BASE_URL
 });
 
+export const authRedirect = {
+  toLogin: () => window.location.assign('/login')
+};
+
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (token: string) => void;
@@ -35,7 +39,7 @@ apiClient.interceptors.response.use(
     const refreshToken = useAuthStore.getState().refreshToken;
     if (!refreshToken) {
       useAuthStore.getState().logout();
-      window.location.assign('/login');
+      authRedirect.toLogin();
       return Promise.reject(error);
     }
 
@@ -59,7 +63,7 @@ apiClient.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       useAuthStore.getState().logout();
-      window.location.assign('/login');
+      authRedirect.toLogin();
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

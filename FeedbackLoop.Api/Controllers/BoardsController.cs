@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FeedbackLoop.Api.Controllers;
 
 [ApiController]
-[Authorize]
+[Authorize(Policy = "MemberOrAbove")]
 [Route("api/boards")]
 public sealed class BoardsController : ControllerBase
 {

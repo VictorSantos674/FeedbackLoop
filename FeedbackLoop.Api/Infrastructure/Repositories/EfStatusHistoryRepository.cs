@@ -18,7 +18,7 @@ public sealed class EfStatusHistoryRepository : IStatusHistoryRepository
         return await _dbContext.StatusHistory
             .Include(history => history.ChangedByUser)
             .Where(history => history.PostId == postId)
-            .OrderByDescending(history => history.ChangedAtUtc)
+            .OrderBy(history => history.ChangedAtUtc)
             .ToListAsync(cancellationToken);
     }
 

@@ -33,6 +33,16 @@ public sealed class EfBoardRepository : IBoardRepository
         return _dbContext.Boards.FirstOrDefaultAsync(board => board.Slug == slug, cancellationToken);
     }
 
+    public Task<Board?> GetBySlugWithWorkspaceAsync(string slug, CancellationToken cancellationToken = default)
+    {
+        return _dbContext.Boards
+            .IgnoreQueryFilters()
+            .Include(board => board.Workspace)
+            .Where(board => board.DeletedAt == null)
+            .OrderBy(board => board.CreatedAtUtc)
+            .FirstOrDefaultAsync(board => board.Slug == slug, cancellationToken);
+    }
+
     public async Task CreateAsync(Board board, CancellationToken cancellationToken = default)
     {
         await _dbContext.Boards.AddAsync(board, cancellationToken);

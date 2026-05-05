@@ -35,6 +35,7 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSett
 builder.Services.AddScoped<ICurrentWorkspaceContext, CurrentWorkspaceContext>();
 builder.Services.AddScoped<ISystemClock, SystemClock>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
@@ -80,6 +81,7 @@ builder.Services
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole(UserRole.Admin.ToString()));
+    // Authenticated read endpoints require at least Member; Viewer is reserved for a future read-only role.
     options.AddPolicy("MemberOrAbove", policy => policy.RequireRole(UserRole.Admin.ToString(), UserRole.Member.ToString()));
 });
 
@@ -88,7 +90,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    if (db.Database.IsRelational())
+    {
+        db.Database.Migrate();
+    }
 }
 
 if (app.Environment.IsDevelopment())

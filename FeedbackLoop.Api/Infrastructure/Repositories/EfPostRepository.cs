@@ -28,11 +28,11 @@ public sealed class EfPostRepository : IPostRepository
         return ApplyFilter(_dbContext.Posts.AsQueryable(), boardId, filter).CountAsync(cancellationToken);
     }
 
-    public Task<Post?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public Task<Post?> GetByIdAsync(Guid id, Guid boardId, CancellationToken cancellationToken = default)
     {
         return _dbContext.Posts
             .Include(post => post.Comments)
-            .FirstOrDefaultAsync(post => post.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(post => post.Id == id && post.BoardId == boardId, cancellationToken);
     }
 
     public async Task CreateAsync(Post post, CancellationToken cancellationToken = default)

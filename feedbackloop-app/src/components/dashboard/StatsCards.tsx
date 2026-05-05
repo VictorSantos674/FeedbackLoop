@@ -1,18 +1,20 @@
 import { CheckCircle, MessageSquare, Vote } from 'lucide-react';
 import { Card } from '../ui/Card';
-import type { Post } from '../../types';
 
-export function StatsCards({ posts }: { posts: Post[] }) {
-  const totalVotes = posts.reduce((sum, post) => sum + post.voteCount, 0);
-  const resolved = posts.filter((post) => post.status === 'Done').length;
-  const open = posts.filter((post) => post.status === 'Open').length;
+export type DashboardStats = {
+  totalPosts: number;
+  openPosts: number;
+  totalVotes: number;
+  resolvedPosts: number;
+};
 
+export function StatsCards({ stats }: { stats: DashboardStats }) {
   return (
     <div className="grid gap-4 md:grid-cols-4">
-      <Stat label="Total de posts" value={posts.length} icon={<MessageSquare size={18} />} />
-      <Stat label="Posts abertos" value={open} icon={<MessageSquare size={18} />} />
-      <Stat label="Total de votos" value={totalVotes} icon={<Vote size={18} />} />
-      <Stat label="Resolvidos" value={resolved} icon={<CheckCircle size={18} />} />
+      <Stat label="Total de posts" value={stats.totalPosts} icon={<MessageSquare size={18} />} />
+      <Stat label="Posts abertos" value={stats.openPosts} icon={<MessageSquare size={18} />} />
+      <Stat label="Total de votos" value={stats.totalVotes} icon={<Vote size={18} />} />
+      <Stat label="Resolvidos" value={stats.resolvedPosts} icon={<CheckCircle size={18} />} />
     </div>
   );
 }

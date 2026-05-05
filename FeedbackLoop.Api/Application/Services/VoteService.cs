@@ -24,7 +24,7 @@ public sealed class VoteService : IVoteService
         _unitOfWork = unitOfWork;
     }
 
-    public Task<VoteResult> ToggleAsync(Guid postId, string endUserToken, CancellationToken cancellationToken = default)
+    public Task<VoteResult> ToggleAsync(Guid boardId, Guid postId, string endUserToken, CancellationToken cancellationToken = default)
     {
         return _transactionRunner.RunAsync(async token =>
         {
@@ -36,7 +36,7 @@ public sealed class VoteService : IVoteService
                 });
             }
 
-            var post = await _posts.GetByIdAsync(postId, token)
+            var post = await _posts.GetByIdAsync(postId, boardId, token)
                 ?? throw new NotFoundException("Post not found.");
 
             var existingVote = await _votes.GetByPostAndUserAsync(postId, endUserToken, token);

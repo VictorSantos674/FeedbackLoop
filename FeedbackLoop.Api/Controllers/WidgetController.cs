@@ -5,6 +5,8 @@ using FeedbackLoop.Api.Domain.DTOs.Votes;
 using FeedbackLoop.Api.Domain.Enums;
 using FeedbackLoop.Api.Domain.Exceptions;
 using FeedbackLoop.Api.Domain.Models;
+using FeedbackLoop.Api.Domain.Entities;
+using FeedbackLoop.Api.Infrastructure.Tenancy;
 using FeedbackLoop.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,12 +19,18 @@ public sealed class WidgetController : ControllerBase
     private readonly IBoardRepository _boards;
     private readonly IPostService _posts;
     private readonly IVoteService _votes;
+    private readonly ICurrentWorkspaceContext _workspaceContext;
 
-    public WidgetController(IBoardRepository boards, IPostService posts, IVoteService votes)
+    public WidgetController(
+        IBoardRepository boards,
+        IPostService posts,
+        IVoteService votes,
+        ICurrentWorkspaceContext workspaceContext)
     {
         _boards = boards;
         _posts = posts;
         _votes = votes;
+        _workspaceContext = workspaceContext;
     }
 
     [HttpGet("posts")]
@@ -36,8 +44,7 @@ public sealed class WidgetController : ControllerBase
         [FromQuery] int pageSize = 20,
         CancellationToken cancellationToken = default)
     {
-        var board = await _boards.GetBySlugAsync(boardSlug, cancellationToken)
-            ?? throw new NotFoundException("Board not found.");
+        var board = await ResolveBoardAndWorkspaceAsync(boardSlug, cancellationToken);
 
         return Ok(await _posts.GetByBoardAsync(
             board.Id,
@@ -48,8 +55,7 @@ public sealed class WidgetController : ControllerBase
     [HttpPost("posts")]
     public async Task<ActionResult<PostResponse>> CreatePost(string boardSlug, CreatePostRequest request, CancellationToken cancellationToken)
     {
-        var board = await _boards.GetBySlugAsync(boardSlug, cancellationToken)
-            ?? throw new NotFoundException("Board not found.");
+        var board = await ResolveBoardAndWorkspaceAsync(boardSlug, cancellationToken);
 
         var response = await _posts.CreateAsync(board.Id, request, cancellationToken);
         return CreatedAtAction(nameof(GetPosts), new { boardSlug }, response);
@@ -62,9 +68,17 @@ public sealed class WidgetController : ControllerBase
         ToggleVoteRequest request,
         CancellationToken cancellationToken)
     {
-        _ = await _boards.GetBySlugAsync(boardSlug, cancellationToken)
+        var board = await ResolveBoardAndWorkspaceAsync(boardSlug, cancellationToken);
+
+        return Ok(await _votes.ToggleAsync(board.Id, postId, request.EndUserToken, cancellationToken));
+    }
+
+    private async Task<Board> ResolveBoardAndWorkspaceAsync(string boardSlug, CancellationToken cancellationToken)
+    {
+        var board = await _boards.GetBySlugWithWorkspaceAsync(boardSlug, cancellationToken)
             ?? throw new NotFoundException("Board not found.");
 
-        return Ok(await _votes.ToggleAsync(postId, request.EndUserToken, cancellationToken));
+        _workspaceContext.SetWorkspace(board.WorkspaceId);
+        return board;
     }
 }

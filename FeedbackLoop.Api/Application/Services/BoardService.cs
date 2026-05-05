@@ -57,7 +57,15 @@ public sealed class BoardService : IBoardService
     {
         var boards = await _boards.GetAllAsync(cancellationToken);
         return boards
-            .Select(board => new BoardSummaryResponse(board.Id, board.Name, board.Slug, board.Posts.Count, board.CreatedAtUtc))
+            .Select(board => new BoardSummaryResponse(
+                board.Id,
+                board.Name,
+                board.Slug,
+                board.Posts.Count,
+                board.Posts.Count(post => post.Status == PostStatus.Open),
+                board.Posts.Count(post => post.Status == PostStatus.Done),
+                board.Posts.Sum(post => post.VoteCount),
+                board.CreatedAtUtc))
             .ToList();
     }
 

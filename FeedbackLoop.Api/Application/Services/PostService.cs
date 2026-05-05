@@ -67,9 +67,9 @@ public sealed class PostService : IPostService
         return new PagedResult<PostResponse>(responses, totalCount, page, pageSize, totalPages);
     }
 
-    public async Task<PostResponse> GetByIdAsync(Guid postId, string? endUserToken = null, CancellationToken cancellationToken = default)
+    public async Task<PostResponse> GetByIdAsync(Guid boardId, Guid postId, string? endUserToken = null, CancellationToken cancellationToken = default)
     {
-        var post = await _posts.GetByIdAsync(postId, cancellationToken)
+        var post = await _posts.GetByIdAsync(postId, boardId, cancellationToken)
             ?? throw new NotFoundException("Post not found.");
 
         return await ToResponseAsync(post, endUserToken, cancellationToken);
@@ -118,7 +118,7 @@ public sealed class PostService : IPostService
         return await ToResponseAsync(post, request.EndUserToken, cancellationToken);
     }
 
-    public async Task<PostResponse> UpdateStatusAsync(Guid postId, PostStatus newStatus, Guid adminUserId, CancellationToken cancellationToken = default)
+    public async Task<PostResponse> UpdateStatusAsync(Guid boardId, Guid postId, PostStatus newStatus, Guid adminUserId, CancellationToken cancellationToken = default)
     {
         var admin = await _users.GetByIdAsync(adminUserId, cancellationToken)
             ?? throw new ForbiddenException();
@@ -128,7 +128,7 @@ public sealed class PostService : IPostService
             throw new ForbiddenException();
         }
 
-        var post = await _posts.GetByIdAsync(postId, cancellationToken)
+        var post = await _posts.GetByIdAsync(postId, boardId, cancellationToken)
             ?? throw new NotFoundException("Post not found.");
 
         if (post.Status != newStatus)
@@ -159,9 +159,9 @@ public sealed class PostService : IPostService
         return await ToResponseAsync(post, null, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<StatusHistoryEntry>> GetStatusHistoryAsync(Guid postId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<StatusHistoryEntry>> GetStatusHistoryAsync(Guid boardId, Guid postId, CancellationToken cancellationToken = default)
     {
-        _ = await _posts.GetByIdAsync(postId, cancellationToken)
+        _ = await _posts.GetByIdAsync(postId, boardId, cancellationToken)
             ?? throw new NotFoundException("Post not found.");
 
         var history = await _statusHistory.GetByPostAsync(postId, cancellationToken);

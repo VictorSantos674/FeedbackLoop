@@ -77,7 +77,7 @@ public sealed class PostServiceTests
         fixture.Users.Setup(repository => repository.GetByIdAsync(member.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(member);
 
-        var act = () => fixture.Service.UpdateStatusAsync(fixture.Post.Id, PostStatus.Planned, member.Id);
+        var act = () => fixture.Service.UpdateStatusAsync(fixture.Board.Id, fixture.Post.Id, PostStatus.Planned, member.Id);
 
         await act.Should().ThrowAsync<ForbiddenException>();
     }
@@ -91,13 +91,13 @@ public sealed class PostServiceTests
 
         fixture.Users.Setup(repository => repository.GetByIdAsync(admin.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(admin);
-        fixture.Posts.Setup(repository => repository.GetByIdAsync(fixture.Post.Id, It.IsAny<CancellationToken>()))
+        fixture.Posts.Setup(repository => repository.GetByIdAsync(fixture.Post.Id, fixture.Board.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(fixture.Post);
         fixture.StatusHistory.Setup(repository => repository.CreateAsync(It.IsAny<StatusHistory>(), It.IsAny<CancellationToken>()))
             .Callback<StatusHistory, CancellationToken>((history, _) => createdHistory = history)
             .Returns(Task.CompletedTask);
 
-        var response = await fixture.Service.UpdateStatusAsync(fixture.Post.Id, PostStatus.Planned, admin.Id);
+        var response = await fixture.Service.UpdateStatusAsync(fixture.Board.Id, fixture.Post.Id, PostStatus.Planned, admin.Id);
 
         response.Status.Should().Be(PostStatus.Planned);
         createdHistory.Should().NotBeNull();

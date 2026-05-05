@@ -2,6 +2,27 @@
 
 Ferramenta B2B para coletar feedback de usuarios e gerenciar o roadmap de produto, uma alternativa simples e acessivel ao Canny.
 
+## Screenshots
+
+### Painel administrativo
+
+![Dashboard](docs/screenshots/01-dashboard.png)
+*Dashboard com metricas consolidadas de todos os boards*
+
+![Board](docs/screenshots/02-board-posts.png)
+*Gestao de posts com mudanca de status inline*
+
+![Post](docs/screenshots/03-post-detail.png)
+*Historico de mudancas de status com linha do tempo*
+
+### Widget embarcavel
+
+![Widget aberto](docs/screenshots/04-widget-open.png)
+*Widget instalado via `<script>` tag - lista de sugestoes com votacao*
+
+![Novo post](docs/screenshots/05-widget-form.png)
+*Formulario de nova sugestao com validacao inline*
+
 ## Como Funciona
 
 Empresas instalam um widget JavaScript no proprio produto:

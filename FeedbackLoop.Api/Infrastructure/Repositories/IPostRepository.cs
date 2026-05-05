@@ -9,7 +9,7 @@ public interface IPostRepository
 
     Task<int> CountByBoardAsync(Guid boardId, PostFilter filter, CancellationToken cancellationToken = default);
 
-    Task<Post?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Post?> GetByIdAsync(Guid id, Guid boardId, CancellationToken cancellationToken = default);
 
     Task CreateAsync(Post post, CancellationToken cancellationToken = default);
 

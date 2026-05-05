@@ -15,4 +15,13 @@ internal static class ControllerUserExtensions
             ? userId
             : throw new UnauthorizedException();
     }
+
+    public static Guid GetWorkspaceId(this ClaimsPrincipal user)
+    {
+        var value = user.FindFirstValue("workspaceId");
+
+        return Guid.TryParse(value, out var workspaceId)
+            ? workspaceId
+            : throw new UnauthorizedException();
+    }
 }

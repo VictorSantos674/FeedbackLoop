@@ -33,6 +33,9 @@ export interface BoardSummary {
   name: string;
   slug: string;
   postCount: number;
+  openPostCount: number;
+  donePostCount: number;
+  voteCount: number;
   createdAt: string;
 }
 
@@ -49,6 +52,16 @@ export interface CreateBoardRequest {
   name: string;
   description?: string;
   isPublic: boolean;
+}
+
+export interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface UpdateWorkspaceRequest {
+  name: string;
 }
 
 export interface Post {

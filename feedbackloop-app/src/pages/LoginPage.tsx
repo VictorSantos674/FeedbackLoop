@@ -32,7 +32,16 @@ export function LoginPage() {
           <Input label="E-mail" type="email" error={form.formState.errors.email?.message} {...form.register('email')} />
           <Input label="Senha" type="password" error={form.formState.errors.password?.message} {...form.register('password')} />
           {login.isError ? <p className="text-sm font-semibold text-red-600">Credenciais invalidas.</p> : null}
-          <Button type="submit" disabled={login.isPending}>{login.isPending ? 'Entrando...' : 'Entrar'}</Button>
+          <Button type="submit" disabled={login.isPending} className="w-full">
+            {login.isPending ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Entrando...
+              </>
+            ) : (
+              'Entrar'
+            )}
+          </Button>
         </form>
         <p className="mt-4 text-sm text-slate-500">
           Ainda nao tem conta? <Link className="font-bold text-brand-700" to="/register">Criar workspace</Link>
