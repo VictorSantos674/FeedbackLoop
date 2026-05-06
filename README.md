@@ -1,6 +1,30 @@
 # FeedbackLoop
 
+[![CI](https://github.com/VictorSantos674/FeedbackLoop/actions/workflows/ci.yml/badge.svg)](https://github.com/VictorSantos674/FeedbackLoop/actions/workflows/ci.yml)
+![API coverage](https://img.shields.io/badge/API_coverage-82.23%25-brightgreen)
+![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)
+![React](https://img.shields.io/badge/React-18-61DAFB)
+
 Ferramenta B2B para coletar feedback de usuarios e gerenciar o roadmap de produto, uma alternativa simples e acessivel ao Canny.
+
+O projeto cobre o fluxo completo de um produto de feedback: cadastro de workspace, painel administrativo autenticado, boards publicos, widget embarcavel para clientes finais, votos, mudancas de status e historico do roadmap.
+
+## Por Que Este Projeto Existe
+
+FeedbackLoop simula um SaaS real para times de produto: empresas criam boards publicos, instalam um widget no proprio app e acompanham sugestoes, votos e mudancas de status em um painel administrativo. O foco tecnico esta em isolamento multi-tenant, autenticacao segura, widget embarcavel e pipeline de qualidade automatizado.
+
+## Comparativo Com Canny
+
+| Recurso | FeedbackLoop | Canny |
+| --- | --- | --- |
+| Boards publicos de feedback | Sim | Sim |
+| Widget embarcavel via script | Sim | Sim |
+| Votos de usuarios finais | Sim | Sim |
+| Painel administrativo | Sim | Sim |
+| Multi-tenancy com isolamento por workspace | Sim | Sim |
+| Historico de status do roadmap | Sim | Sim |
+| Codigo aberto para avaliacao tecnica | Sim | Nao |
+| Foco do projeto | Portfolio full-stack e arquitetura SaaS | Produto comercial completo |
 
 ## Screenshots
 
@@ -49,7 +73,19 @@ Os usuarios finais sugerem features e votam. A equipe gerencia tudo pelo painel 
 | Painel | React 18, TypeScript, TanStack Query, Zustand |
 | Widget | React 18, Vite, bundle UMD self-contained |
 | Auth | JWT + Refresh Token com rotacao e deteccao de reutilizacao |
-| Testes | xUnit + Moq, Vitest + Testing Library |
+| Testes | xUnit, WebApplicationFactory, Moq, Vitest + Testing Library |
+| CI/CD | GitHub Actions com build, testes, cobertura minima e smoke test Docker |
+
+## Qualidade
+
+| Area | Status |
+| --- | --- |
+| API | 22 testes passando |
+| Cobertura da API | 82.23% line coverage |
+| Coverage gate | Minimo de 60% no CI |
+| Frontend app | Vitest + Testing Library |
+| Widget | Vitest + Testing Library |
+| Smoke test | Docker Compose sobe Postgres, API e app; valida `/health` e container web |
 
 ## Rodar Localmente Com Docker
 
@@ -62,6 +98,7 @@ Acesse:
 
 - Painel: http://localhost:3000
 - API + Swagger: http://localhost:5000/swagger
+- Health check: http://localhost:5000/health
 
 ## Rodar Sem Docker
 
@@ -96,21 +133,28 @@ Depois abra `feedbackloop-widget/test.html` no navegador.
 ## Testes
 
 ```bash
-# API (16 testes)
+# API
 dotnet test FeedbackLoop.sln
 
-# Painel (9 testes)
+# API com cobertura minima local
+dotnet test FeedbackLoop.sln /p:CollectCoverage=true /p:Threshold=60 /p:ThresholdType=line
+
+# Painel
 cd feedbackloop-app && npm run test
 
-# Widget (9 testes)
+# Widget
 cd feedbackloop-widget && npm run test
 ```
+
+O CI executa os tres suites e depois sobe `postgres`, `api` e `app` com Docker Compose para validar o endpoint `/health` da API e o container web.
 
 ## Arquitetura
 
 ### Multi-Tenancy
 
 Cada empresa cliente e um `Workspace`. O `WorkspaceId` e extraido do JWT e aplicado como filtro global no EF Core. Dados de workspaces diferentes nao se cruzam nas queries autenticadas.
+
+Os testes de integracao exercitam esse isolamento via HTTP real com `WebApplicationFactory`, banco EF InMemory por teste e pipeline ASP.NET Core completo.
 
 ### Widget Embarcavel
 
@@ -177,3 +221,13 @@ As migrations do EF Core sao aplicadas automaticamente no startup da API, inclus
 - [ ] Integracao com Slack via webhook
 - [ ] Plano de billing com Stripe
 - [ ] Deploy one-click no Railway
+
+## Padrao de Commits
+
+Use Conventional Commits em ingles, no imperativo:
+
+```bash
+test(api): add end-to-end feedback workflow coverage
+ci: add coverage gate and docker smoke test
+docs: document CI, health check, and local test commands
+```
